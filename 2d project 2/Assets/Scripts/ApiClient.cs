@@ -6,6 +6,21 @@ using UnityEngine.Networking;
 public class ApiClient : MonoBehaviour
 {
 
+    public static ApiClient instance { get; private set; }
+    void Awake()
+    {
+        // hier controleren we of er al een instantie is van deze singleton
+        // als dit zo is dan hoeven we geen nieuwe aan te maken en verwijderen we deze
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
+        DontDestroyOnLoad(this);
+    }
     private async Task<string> PerformApiCall(string url, string method, string jsonData = null, string token = null)
     {
         using (UnityWebRequest request = new UnityWebRequest(url, method))
