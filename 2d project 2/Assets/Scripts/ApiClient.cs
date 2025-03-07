@@ -2,9 +2,15 @@ using UnityEngine;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
+using UnityEngine.UI;
+using TMPro;
+using System.Text.RegularExpressions;
 
 public class ApiClient : MonoBehaviour
 {
+    public TMP_InputField emailInput;
+    public TMP_InputField passwordInput;
+    public TMP_Text errorText;
 
     public static ApiClient instance { get; private set; }
     void Awake()
@@ -54,31 +60,72 @@ public class ApiClient : MonoBehaviour
 
     public async void Register()
     {
-        var registerDto = new PostRegisterRequestDto() { 
-        email = "tk.tsoieeeeee@student.avans.nl",
-        password = "VaO|E`SF(wp<\\dX1[@Fy|-)\"g[~=KkXd({D~/8!G%{7-1v*\\U-Yj*lzy\"7~G\\\"F#2$<.bH1Hlh#Ot4,2%l})4*<jkiN*KT!3VTn>g~P{%H%An4B7d^2M8cyGzI=nyBx;+~4)%=n</!WAu9wKT{gpv#GK`RN@.vK\"GrU.-)!H,6C)-|Y:nN~Pscdf.'YCxxyi|NCT,Cz7gY/!1-cjVQ&7@>S<a(Tj(~%j%}mQNQ>P.mBB!/h`)F]Kn3zu/atoN'UA2c0sx_]8~hz;${GoR%n67Nw5<S&|]mh;dWX5/ywd@[q\"4X~-`Y,+,sKz{q<cR*\\VR~LYR6o^g7-\"\"?uUMx6We):/5].5{H\"~{pzk>1};$Z|zI-MC-AmMm31GFfa@9P-qRR<hSvT8KOk5v`(Q=pJ-]jRA-L=qUgUPH3A4%,j/8EgfY{E1/e{<@wdm?BNqw;8)~Y)fi5?ch!Qt^KV2d@6-a<OUSMdWq`<o/pf:({zK3$}~b>@v\\'4\"dK'.o4pK~O%A"
-        };
+        bool wachtwoordValidatie = await WachtwoordValidatieAsync(passwordInput.text);
+        if (wachtwoordValidatie)
+        {
+            var registerDto = new PostRegisterRequestDto()
+            {
+                email = emailInput.text.ToString(),
+                password = passwordInput.text.ToString()
+            };
 
+            string jsonData = JsonUtility.ToJson(registerDto);
 
-        string jsonData = JsonUtility.ToJson(registerDto);
-
-        var response = await PerformApiCall("https://avansict123456.azurewebsites.net/account/register", "POST", jsonData);
-        Debug.Log(response);
+            var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/account/register", "POST", jsonData);
+            Debug.Log(response);
+            Debug.Log(emailInput.text);
+            Debug.Log(passwordInput.text);
+        }
     }
 
     public async void Login()
     {
         var loginDto = new PostLoginRequestDto()
         {
-            email = "tk.tsoieeeeee@student.avans.nl",
-            password = "VaO|E`SF(wp<\\dX1[@Fy|-)\"g[~=KkXd({D~/8!G%{7-1v*\\U-Yj*lzy\"7~G\\\"F#2$<.bH1Hlh#Ot4,2%l})4*<jkiN*KT!3VTn>g~P{%H%An4B7d^2M8cyGzI=nyBx;+~4)%=n</!WAu9wKT{gpv#GK`RN@.vK\"GrU.-)!H,6C)-|Y:nN~Pscdf.'YCxxyi|NCT,Cz7gY/!1-cjVQ&7@>S<a(Tj(~%j%}mQNQ>P.mBB!/h`)F]Kn3zu/atoN'UA2c0sx_]8~hz;${GoR%n67Nw5<S&|]mh;dWX5/ywd@[q\"4X~-`Y,+,sKz{q<cR*\\VR~LYR6o^g7-\"\"?uUMx6We):/5].5{H\"~{pzk>1};$Z|zI-MC-AmMm31GFfa@9P-qRR<hSvT8KOk5v`(Q=pJ-]jRA-L=qUgUPH3A4%,j/8EgfY{E1/e{<@wdm?BNqw;8)~Y)fi5?ch!Qt^KV2d@6-a<OUSMdWq`<o/pf:({zK3$}~b>@v\\'4\"dK'.o4pK~O%A"
+            email = emailInput.text.ToString(),
+            password = passwordInput.text.ToString()
         };
 
 
         string jsonData = JsonUtility.ToJson(loginDto);
 
-        var response = await PerformApiCall("https://avansict123456.azurewebsites.net/account/login", "POST", jsonData);
+        var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/account/login", "POST", jsonData);
         var responseDto = JsonUtility.FromJson<PostLoginResponseDto>(response);
         Debug.Log(response);
+        Debug.Log(emailInput.text);
+        Debug.Log(passwordInput.text);
+    }
+
+    public async Task <bool> WachtwoordValidatieAsync(string wachtwoord)
+    {
+        errorText.text = "";
+        string password = wachtwoord;
+        if (password.Length < 10)
+        {
+            errorText.text = "Wachtwoord moet minimaal 10 karakters lang zijn.";
+        }
+
+        if (!Regex.IsMatch(password, "[A-Z]"))
+        {
+            errorText.text = "Wachtwoord moet minstens 1 hoofdletter bevatten.";
+        }
+
+        if (!Regex.IsMatch(password, "[a-z]"))
+        {
+            errorText.text = "Wachtwoord moet minstens 1 kleine letter bevatten.";
+        }
+
+        if (!Regex.IsMatch(password, "[0-9]"))
+        {
+            errorText.text = "Wachtwoord moet minstens 1 cijfer bevatten.";
+        }
+
+        if (!Regex.IsMatch(password, "[^a-zA-Z0-9]"))
+        {
+            errorText.text = "Wachtwoord moet minstens 1 niet-alfanumeriek teken bevatten.";
+        }
+
+         // Wachtwoord is geldig
+        return true;
     }
 }
