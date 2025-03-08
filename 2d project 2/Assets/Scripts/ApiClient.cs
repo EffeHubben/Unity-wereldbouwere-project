@@ -96,7 +96,7 @@ public class ApiClient : MonoBehaviour
         bool responseSuccess = response.ToString().Contains("token");
         if (responseSuccess)
         {
-            loginWarning.text = "Email of wachtwoord is juist.";
+            loginWarning.text = "Email en wachtwoord is juist.";
         }
 
         var responseDto = JsonUtility.FromJson<PostLoginResponseDto>(response); 

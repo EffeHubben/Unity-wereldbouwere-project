@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Text.RegularExpressions;
 using System;
+using System.Collections.Generic;
 
 public class ApiWorldClient : MonoBehaviour
 {
@@ -69,7 +70,7 @@ public class ApiWorldClient : MonoBehaviour
             string jsonData = JsonUtility.ToJson(registerDto);
             var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/wereldbouwer", "POST", jsonData, SessionData.token);
             Debug.Log(response);
-        }   else
+        } else
         {
             Debug.LogError("SessionData token is null");
         }
@@ -85,17 +86,24 @@ public class ApiWorldClient : MonoBehaviour
             string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/getwereld/{SessionData.ownerUserId}";
             var response = await PerformApiCall(url, "GET", null, SessionData.token);
 
-            if (!string.IsNullOrEmpty(response))
+            try
             {
-                var worldsResponse = JsonUtility.FromJson<GetWorldsResponseDto>(response);
-                foreach (var world in worldsResponse.worlds)
+                var worldsResponse = JsonUtility.FromJson<GetWorldsResponseDto>("{\"worlds\":" + response + "}");
+                if (worldsResponse != null && worldsResponse.worlds != null)
                 {
-                    Debug.Log($"World ID: {world.worldId}, Name: {world.worldName}, Owner: {world.ownerUserId}");
+                    foreach (var world in worldsResponse.worlds)
+                    {
+                        Debug.Log($"World ID: {world.id}, Name: {world.name}, Owner: {world.ownerUserId}");
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Failed to load worlds or no worlds found.");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Debug.LogError("Failed to load worlds or no worlds found.");
+                Debug.LogError("Error deserializing JSON response: " + ex.Message);
             }
         }
         else

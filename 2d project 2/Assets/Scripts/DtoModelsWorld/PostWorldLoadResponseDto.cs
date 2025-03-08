@@ -6,9 +6,9 @@ using UnityEngine;
 [Serializable]
 public class PostWorldLoadResponseDto
 {
-    public Guid worldId;
-    public string worldName;
-    public Guid ownerUserId;
+    public string id;
+    public string name;
+    public string ownerUserId;
     public int maxLength;
     public int maxHeight;
 }
