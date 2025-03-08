@@ -4,13 +4,17 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using TMPro;
-using System.Text.RegularExpressions;
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 public class ApiWorldClient : MonoBehaviour
 {
     public TMP_InputField nameInput;
+    public TMP_Text nameText;
+    public GameObject worldPrefab; // Reference to the prefab
+    public Transform worldContainer; // Reference to the container\
+    public Button createButton; // Reference to the create button
     public static ApiWorldClient instance { get; private set; }
     void Awake()
     {
@@ -63,7 +67,7 @@ public class ApiWorldClient : MonoBehaviour
             var registerDto = new PostWorldRegisterRequestDto()
             {
                 name = nameInput.text,
-                ownerUserId = "<string>",
+                ownerUserId = SessionData.ownerUserId,
                 maxLength = 200,
                 maxHeight = 200
             };
@@ -86,14 +90,29 @@ public class ApiWorldClient : MonoBehaviour
             string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/getwereld/{SessionData.ownerUserId}";
             var response = await PerformApiCall(url, "GET", null, SessionData.token);
 
+            if (response == null)
+            {
+                Debug.LogError("API response is null");
+                return;
+            }
+
+            Debug.Log("API Response: " + response);
+
             try
             {
-                var worldsResponse = JsonUtility.FromJson<GetWorldsResponseDto>("{\"worlds\":" + response + "}");
-                if (worldsResponse != null && worldsResponse.worlds != null)
+                List<PostWorldLoadResponseDto> worlds = JsonConvert.DeserializeObject<List<PostWorldLoadResponseDto>>(response);
+                if (worlds != null)
                 {
-                    foreach (var world in worldsResponse.worlds)
+                    int worldCount = worlds.Count;
+                    for (int i = 0; i < worldCount && i < 5; i++)
                     {
-                        Debug.Log($"World ID: {world.id}, Name: {world.name}, Owner: {world.ownerUserId}");
+                        var world = worlds[i];
+                        CreateWorldPrefab(world);
+                    }
+
+                    for (int i = worldCount; i < 5; i++)
+                    {
+                        CreateEmptyWorldPrefab();
                     }
                 }
                 else
@@ -110,5 +129,40 @@ public class ApiWorldClient : MonoBehaviour
         {
             Debug.LogError("SessionData token is null");
         }
+    }
+
+    private void CreateWorldPrefab(PostWorldLoadResponseDto world)
+    {
+        GameObject worldObject = Instantiate(worldPrefab, worldContainer);
+        TMP_InputField inputField = worldObject.transform.Find("NameInput").GetComponent<TMP_InputField>();
+        TMP_Text nameText = worldObject.transform.Find("NameText").GetComponent<TMP_Text>();
+        Button loadButton = worldObject.transform.Find("LoadButton").GetComponent<Button>();
+        Button createButton = worldObject.transform.Find("CreateButton").GetComponent<Button>();
+
+        inputField.text = world.name;
+        nameText.text = world.name;
+        loadButton.onClick.AddListener(() => LoadSpecificWorld(world.id));
+
+        createButton.gameObject.SetActive(false);
+        inputField.gameObject.SetActive(false);
+    }
+
+    private void CreateEmptyWorldPrefab()
+    {
+        GameObject worldObject = Instantiate(worldPrefab, worldContainer);
+        TMP_InputField inputField = worldObject.transform.Find("NameInput").GetComponent<TMP_InputField>();
+        TMP_Text nameText = worldObject.transform.Find("NameText").GetComponent<TMP_Text>();
+        Button createButton = worldObject.transform.Find("CreateButton").GetComponent<Button>();
+
+        inputField.text = "";
+        nameText.text = "Create New World";
+        createButton.gameObject.SetActive(true);
+        createButton.onClick.AddListener(() => RegisterWorld());
+    }
+
+    public void LoadSpecificWorld(string worldId)
+    {
+        Debug.Log($"Loading world with ID: {worldId}");
+        // Implement the logic to load the specific world
     }
 }
