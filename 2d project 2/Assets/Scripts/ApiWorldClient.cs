@@ -77,4 +77,30 @@ public class ApiWorldClient : MonoBehaviour
         Debug.Log(nameInput.text);
 
     }
+
+    public async void LoadWorld()
+    {
+        if (SessionData.token != null)
+        {
+            string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/getwereld/{SessionData.ownerUserId}";
+            var response = await PerformApiCall(url, "GET", null, SessionData.token);
+
+            if (!string.IsNullOrEmpty(response))
+            {
+                var worldsResponse = JsonUtility.FromJson<GetWorldsResponseDto>(response);
+                foreach (var world in worldsResponse.worlds)
+                {
+                    Debug.Log($"World ID: {world.worldId}, Name: {world.worldName}, Owner: {world.ownerUserId}");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to load worlds or no worlds found.");
+            }
+        }
+        else
+        {
+            Debug.LogError("SessionData token is null");
+        }
+    }
 }
