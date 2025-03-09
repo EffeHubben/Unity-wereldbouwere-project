@@ -13,7 +13,7 @@ public class ApiWorldClient : MonoBehaviour
     public TMP_InputField nameInput;
     public TMP_Text nameText;
     public GameObject worldPrefab; // Reference to the prefab
-    public Transform worldContainer; // Reference to the container\
+    public RectTransform worldContainer; // Reference to the container\
     public Button createButton; // Reference to the create button
     public static ApiWorldClient instance { get; private set; }
     void Awake()
@@ -134,10 +134,10 @@ public class ApiWorldClient : MonoBehaviour
     private void CreateWorldPrefab(PostWorldLoadResponseDto world)
     {
         GameObject worldObject = Instantiate(worldPrefab, worldContainer);
-        TMP_InputField inputField = worldObject.transform.Find("NameInput").GetComponent<TMP_InputField>();
-        TMP_Text nameText = worldObject.transform.Find("NameText").GetComponent<TMP_Text>();
-        Button loadButton = worldObject.transform.Find("LoadButton").GetComponent<Button>();
-        Button createButton = worldObject.transform.Find("CreateButton").GetComponent<Button>();
+        TMP_InputField inputField = worldObject.transform.Find("InputName").GetComponent<TMP_InputField>();
+        TMP_Text nameText = worldObject.transform.Find("WorldName").GetComponent<TMP_Text>();
+        Button loadButton = worldObject.transform.Find("Load World").GetComponent<Button>();
+        Button createButton = worldObject.transform.Find("Create World").GetComponent<Button>();
 
         inputField.text = world.name;
         nameText.text = world.name;
@@ -150,9 +150,9 @@ public class ApiWorldClient : MonoBehaviour
     private void CreateEmptyWorldPrefab()
     {
         GameObject worldObject = Instantiate(worldPrefab, worldContainer);
-        TMP_InputField inputField = worldObject.transform.Find("NameInput").GetComponent<TMP_InputField>();
-        TMP_Text nameText = worldObject.transform.Find("NameText").GetComponent<TMP_Text>();
-        Button createButton = worldObject.transform.Find("CreateButton").GetComponent<Button>();
+        TMP_InputField inputField = worldObject.transform.Find("InputName").GetComponent<TMP_InputField>();
+        TMP_Text nameText = worldObject.transform.Find("WorldName").GetComponent<TMP_Text>();
+        Button createButton = worldObject.transform.Find("Create World").GetComponent<Button>();
 
         inputField.text = "";
         nameText.text = "Create New World";
