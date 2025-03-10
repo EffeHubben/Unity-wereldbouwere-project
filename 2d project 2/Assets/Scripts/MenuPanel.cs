@@ -1,48 +1,25 @@
-using NUnit.Framework;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Timeline;
-using System.Collections.Generic;
 
 public class MenuPanel : MonoBehaviour
 {
+    public GameObject sidePanel;
+    public bool isPanelOpen = false;
 
-    public List<GameObject> prefabs;
-
-    private List<GameObject> items = new List<GameObject>();
-
-    public void CreateGameObjectFromClick(int prefabIndex)
+    public void TogglePanel()
     {
-        var well = Instantiate(prefabs[prefabIndex], Vector3.zero, Quaternion.identity);
-        var daWell = well.GetComponent<DragDrop>();
-
-        daWell.isDragging = true;
-        daWell.menuPanel = this;
-
-        HideMenu(false);
-        items.Add(well);
+        isPanelOpen = !isPanelOpen;
+        sidePanel.SetActive(isPanelOpen);
     }
 
-    public void HideMenu(bool show)
+    public void OpenPanel()
     {
-        this.gameObject.SetActive(show);
+        isPanelOpen = true;
+        sidePanel.SetActive(true);
     }
 
-    public void ResetGame()
+    public void ClosePanel()
     {
-        foreach(var well in items)
-        {
-            Destroy(well);
-            Debug.Log("Destroying well");
-        }
+        isPanelOpen = false;
+        sidePanel.SetActive(false);
     }
-
-    //public void SaveWorld()
-    //{
-      //  foreach (var well in items)
-        //{
-        //    Debug.Log(well.gameObject.tag);
-        //}
-
-//    }
 }
