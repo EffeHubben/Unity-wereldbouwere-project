@@ -7,6 +7,7 @@ using TMPro;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using UnityEngine.InputSystem.XR;
 
 public class ApiWorldClient : MonoBehaviour
 {
@@ -14,10 +15,11 @@ public class ApiWorldClient : MonoBehaviour
     public TMP_Text nameText;
     public GameObject worldPrefab; // Reference to the prefab
     public RectTransform worldContainer; // Reference to the container\
-    public Button createButton; // Reference to the create button
+    public Button createButton; // Reference to the create button\
     public static ApiWorldClient instance { get; private set; }
     void Awake()
     {
+        LoadWorld();
         // hier controleren we of er al een instantie is van deze singleton
         // als dit zo is dan hoeven we geen nieuwe aan te maken en verwijderen we deze
         if (instance != null && instance != this)
@@ -60,13 +62,16 @@ public class ApiWorldClient : MonoBehaviour
             }
         }
     }
-    public async void RegisterWorld()
+    public async void RegisterWorld(WorldPrefabController controller)
     {
+        Debug.Log($"InputName: {nameInput}");
+
+
         if (SessionData.token != null)
         {
             var registerDto = new PostWorldRegisterRequestDto()
             {
-                name = nameInput.text,
+                name = controller.inputName.text,
                 ownerUserId = SessionData.ownerUserId,
                 maxLength = 200,
                 maxHeight = 200
@@ -80,13 +85,17 @@ public class ApiWorldClient : MonoBehaviour
         }
         Debug.Log(SessionData.token);
         Debug.Log(nameInput.text);
-
+        LoadWorld();
     }
 
     public async void LoadWorld()
     {
         if (SessionData.token != null)
         {
+            foreach (Transform child in worldContainer)
+            {
+                Destroy(child.gameObject);
+            }
             string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/getwereld/{SessionData.ownerUserId}";
             var response = await PerformApiCall(url, "GET", null, SessionData.token);
 
@@ -134,35 +143,45 @@ public class ApiWorldClient : MonoBehaviour
     private void CreateWorldPrefab(PostWorldLoadResponseDto world)
     {
         GameObject worldObject = Instantiate(worldPrefab, worldContainer);
-        TMP_InputField inputField = worldObject.transform.Find("InputName").GetComponent<TMP_InputField>();
-        TMP_Text nameText = worldObject.transform.Find("WorldName").GetComponent<TMP_Text>();
-        Button loadButton = worldObject.transform.Find("Load World").GetComponent<Button>();
-        Button createButton = worldObject.transform.Find("Create World").GetComponent<Button>();
-
-        inputField.text = world.name;
-        nameText.text = world.name;
-        loadButton.onClick.AddListener(() => LoadSpecificWorld(world.id));
-
-        createButton.gameObject.SetActive(false);
-        inputField.gameObject.SetActive(false);
+        WorldPrefabController controller = worldObject.GetComponent<WorldPrefabController>();
+        controller.Initialize(this, world);
     }
 
     private void CreateEmptyWorldPrefab()
     {
         GameObject worldObject = Instantiate(worldPrefab, worldContainer);
-        TMP_InputField inputField = worldObject.transform.Find("InputName").GetComponent<TMP_InputField>();
-        TMP_Text nameText = worldObject.transform.Find("WorldName").GetComponent<TMP_Text>();
-        Button createButton = worldObject.transform.Find("Create World").GetComponent<Button>();
-
-        inputField.text = "";
-        nameText.text = "Create New World";
-        createButton.gameObject.SetActive(true);
-        createButton.onClick.AddListener(() => RegisterWorld());
+        WorldPrefabController controller = worldObject.GetComponent<WorldPrefabController>();
+        controller.Initialize(this);
     }
 
     public void LoadSpecificWorld(string worldId)
     {
-        Debug.Log($"Loading world with ID: {worldId}");
+        SessionData.worldId = worldId;
+        Debug.Log($"Loading world with ID: {SessionData.worldId}");
         // Implement the logic to load the specific world
+    }
+
+    public async void DeleteSpecificWorld(string worldId)
+    {
+        if (SessionData.token != null)
+        {
+            string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/{worldId}";
+            var response = await PerformApiCall(url, "DELETE", null, SessionData.token);
+
+            if (response != null)
+            {
+                Debug.Log($"Wereld met ID {worldId} verwijderd: {response}");
+                // Hier kun je eventueel de UI updaten of andere acties uitvoeren na het verwijderen
+                LoadWorld(); // Herlaad de wereldlijst na het verwijderen
+            }
+            else
+            {
+                Debug.LogError($"Fout bij het verwijderen van wereld met ID {worldId}");
+            }
+        }
+        else
+        {
+            Debug.LogError("SessionData token is null");
+        }
     }
 }
