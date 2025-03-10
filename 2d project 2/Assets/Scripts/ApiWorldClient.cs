@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.SceneManagement;
 
 public class ApiWorldClient : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class ApiWorldClient : MonoBehaviour
     public GameObject worldPrefab; // Reference to the prefab
     public RectTransform worldContainer; // Reference to the container\
     public Button createButton; // Reference to the create button\
+    public int minWorldNameLength = 1;
+    public int maxWorldNameLength = 25;
     public static ApiWorldClient instance { get; private set; }
     void Awake()
     {
@@ -66,6 +69,12 @@ public class ApiWorldClient : MonoBehaviour
     {
         Debug.Log($"InputName: {nameInput}");
 
+        // Controleer de lengte van de wereldnaam
+        if (controller.inputName.text.Length < minWorldNameLength || controller.inputName.text.Length > maxWorldNameLength)
+        {
+            Debug.LogError($"Wereldnaam moet tussen {minWorldNameLength} en {maxWorldNameLength} karakters lang zijn.");
+            return; // Stop de registratie als de lengte niet klopt
+        }
 
         if (SessionData.token != null)
         {
@@ -159,6 +168,7 @@ public class ApiWorldClient : MonoBehaviour
         SessionData.worldId = worldId;
         Debug.Log($"Loading world with ID: {SessionData.worldId}");
         // Implement the logic to load the specific world
+        SceneManager.LoadScene("World 1");
     }
 
     public async void DeleteSpecificWorld(string worldId)
