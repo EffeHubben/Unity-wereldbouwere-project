@@ -175,6 +175,7 @@ public class ApiWorldClient : MonoBehaviour
     {
         if (SessionData.token != null)
         {
+            DeleteWorldObjectsFromLoad();
             string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/{worldId}";
             var response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
@@ -193,5 +194,13 @@ public class ApiWorldClient : MonoBehaviour
         {
             Debug.LogError("SessionData token is null");
         }
+    }
+
+    public async void DeleteWorldObjectsFromLoad()
+    {
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/environment/{SessionData.worldId}";
+        string response = await PerformApiCall(url, "Delete", null, SessionData.token);
+
+        Debug.Log(response);
     }
 }

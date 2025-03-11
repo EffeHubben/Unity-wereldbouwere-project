@@ -15,6 +15,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
 
     void Awake()
     {
+        LoadWorld();
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
@@ -218,5 +219,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
 
         Debug.Log(response);
     }
+
+
 
 }
