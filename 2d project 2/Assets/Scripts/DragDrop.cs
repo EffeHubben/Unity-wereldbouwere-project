@@ -2,52 +2,24 @@ using UnityEngine;
 
 public class DragDrop : MonoBehaviour
 {
-    private Vector3 offset;
-    private bool isDragging = false;
-    public GameObject prefabToInstantiate; // De prefab die je wilt instantieren
-
-    void OnMouseDown()
+    public bool isDragging;
+    public MenuPanel menuPanel;
+    private void OnMouseDown()
     {
-        // Als je op een sprite in het zijpaneel klikt
-        if (prefabToInstantiate != null)
-        {
-            // Instantieer de prefab en maak het de huidige sprite
-            GameObject newSprite = Instantiate(prefabToInstantiate, Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
-            newSprite.transform.position = new Vector3(newSprite.transform.position.x, newSprite.transform.position.y, 0); // Z-as op 0 houden
-            newSprite.tag = "Instantiated"; // Geef de sprite de tag "Instantiated"
-            GetComponent<SpriteRenderer>().sprite = newSprite.GetComponent<SpriteRenderer>().sprite;
-            prefabToInstantiate = null; // Reset de prefabToInstantiate
+        isDragging = !isDragging;
 
-            offset = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            isDragging = true;
-        }
-        else
+        if (isDragging == false)
         {
-            offset = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            isDragging = true;
+            menuPanel.HideMenu(true);
         }
-
     }
 
-    void OnMouseDrag()
+    void Update()
     {
         if (isDragging)
         {
-            Vector3 newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition) + offset;
-            newPosition.z = 0; // Z-as op 0 houden
-            transform.position = newPosition;
-        }
-    }
-
-    void OnMouseUp()
-    {
-        isDragging = false;
-        if (prefabToInstantiate == null)
-        {
-            GameObject newSprite = Instantiate(prefabToInstantiate, Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
-            newSprite.tag = "Instantiated"; // Geef de sprite de tag "Instantiated"
-            GetComponent<SpriteRenderer>().sprite = newSprite.GetComponent<SpriteRenderer>().sprite;
-            prefabToInstantiate = null; // Reset de prefabToInstantiate
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            transform.position = new Vector3(mousePosition.x, mousePosition.y, 0);
         }
     }
 }

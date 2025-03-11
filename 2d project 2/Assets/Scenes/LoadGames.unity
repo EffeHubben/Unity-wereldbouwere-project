@@ -360,7 +360,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Select you're world
+  m_text: Selecteer je wereld
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -839,6 +839,8 @@ MonoBehaviour:
   worldPrefab: {fileID: 7208773046803597609, guid: 11d1179c51d15424b9d749d7aa25b8e7, type: 3}
   worldContainer: {fileID: 1288204347}
   createButton: {fileID: 6939101311193087442}
+  minWorldNameLength: 1
+  maxWorldNameLength: 25
 --- !u!4 &1855225462
 Transform:
   m_ObjectHideFlags: 0

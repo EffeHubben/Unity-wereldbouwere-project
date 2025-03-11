@@ -1,20 +1,18 @@
 using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
-using Newtonsoft.Json;
-using System;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using Newtonsoft.Json;
 using UnityEngine.Networking;
 
 public class ApiWorldLoaderClient : MonoBehaviour
 {
+    public List<GameObject> prefabs; // Lijst van beschikbare prefabs
     public List<PrefabData> instantiatedPrefabsData = new List<PrefabData>();
     public static ApiWorldLoaderClient instance { get; private set; }
+
     void Awake()
     {
-        // hier controleren we of er al een instantie is van deze singleton
-        // als dit zo is dan hoeven we geen nieuwe aan te maken en verwijderen we deze
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
@@ -25,6 +23,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
         }
         DontDestroyOnLoad(this);
     }
+
     private async Task<string> PerformApiCall(string url, string method, string jsonData = null, string token = null)
     {
         using (UnityWebRequest request = new UnityWebRequest(url, method))
@@ -63,42 +62,44 @@ public class ApiWorldLoaderClient : MonoBehaviour
 
         foreach (GameObject obj in instantiatedObjects)
         {
-            PrefabData data = new PrefabData();
-            data.id = "<string>";
-            data.environmentId = SessionData.worldId;
-            data.prefabId = obj.name.Replace("(Clone)", "");
-            data.positionX = obj.transform.position.x;
-            data.positionY = obj.transform.position.y;
-            data.scaleX = obj.transform.localScale.x;
-            data.scaleY = obj.transform.localScale.y;
-            data.rotationZ = obj.transform.rotation.eulerAngles.z;
-            data.sortingLayer = obj.GetComponent<SpriteRenderer>().sortingLayerID;
-            instantiatedPrefabsData.Add(data);
+            string prefabName = obj.name.Replace("(Clone)", "").Trim();
+            int prefabIndex = prefabs.FindIndex(prefab => prefab.name == prefabName);
+            if (prefabIndex != -1) // Controleer of de prefab is gevonden
+            {
+                PrefabData data = new PrefabData
+                {
+                    environmentId = SessionData.worldId,
+                    prefabId = prefabIndex.ToString(),
+                    positionX = obj.transform.position.x,
+                    positionY = obj.transform.position.y,
+                    scaleX = obj.transform.localScale.x,
+                    scaleY = obj.transform.localScale.y,
+                    rotationZ = obj.transform.rotation.eulerAngles.z,
+                    sortingLayer = obj.GetComponent<SpriteRenderer>().sortingLayerID
+                };
+                instantiatedPrefabsData.Add(data);
+
+                string jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
+                string url = "https://avansict2228256.azurewebsites.net/Object2D";
+                string response = await PerformApiCall(url, "POST", jsonData, SessionData.token);
+
+                if (response != null)
+                {
+                    Debug.Log("World data saved to API: " + response);
+                }
+                else
+                {
+                    Debug.LogError("Failed to save world data to API.");
+                }
+            }
         }
 
-        // Gebruik de API om de werelddata op te slaan
-        await SaveWorldDataToApi(instantiatedPrefabsData);
     }
 
-    private async Task SaveWorldDataToApi(List<PrefabData> data)
-    {
-        string jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
-        string url = "https://avansict2228256.azurewebsites.net/Object2D"; // Vervang door de juiste URL
-        string response = await PerformApiCall(url, "POST", jsonData, SessionData.token);
-
-        if (response != null)
-        {
-            Debug.Log("World data saved to API: " + response);
-        }
-        else
-        {
-            Debug.LogError("Failed to save world data to API.");
-        }
-    }
 
     public async void LoadWorld()
     {
-        string url = $"https://avansict2228256.azurewebsites.net/Object2D/{SessionData.worldId}"; // Vervang door de juiste URL
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/{SessionData.worldId}";
         string response = await PerformApiCall(url, "GET", null, SessionData.token);
 
         if (response != null)
