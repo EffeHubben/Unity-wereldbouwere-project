@@ -9,7 +9,7 @@ public class MenuPanel : MonoBehaviour
 
     public List<GameObject> prefabs;
 
-    private List<GameObject> items = new List<GameObject>();
+    public static List<GameObject> items = new List<GameObject>();
 
     public void CreateGameObjectFromClick(int prefabIndex)
     {

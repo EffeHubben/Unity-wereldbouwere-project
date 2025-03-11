@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
+using System;
+using JetBrains.Annotations;
 
 public class ApiWorldLoaderClient : MonoBehaviour
 {
@@ -59,17 +61,26 @@ public class ApiWorldLoaderClient : MonoBehaviour
     {
         instantiatedPrefabsData.Clear();
         GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
+        List<PrefabData> currentData = new List<PrefabData>();
+
+        // Haal de huidige data op van de API.
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/{SessionData.worldId}";
+        string response = await PerformApiCall(url, "GET", null, SessionData.token);
+
+        if (response != null)
+        {
+            currentData = JsonConvert.DeserializeObject<List<PrefabData>>(response);
+        }
 
         foreach (GameObject obj in instantiatedObjects)
         {
-            string prefabName = obj.name.Replace("(Clone)", "").Trim();
-            int prefabIndex = prefabs.FindIndex(prefab => prefab.name == prefabName);
-            if (prefabIndex != -1) // Controleer of de prefab is gevonden
+            string prefabName = obj.name.Replace("(Clone)", "");
+            if (prefabName != null) // Controleer of de prefab is gevonden
             {
-                PrefabData data = new PrefabData
+                PrefabData newData = new PrefabData
                 {
                     environmentId = SessionData.worldId,
-                    prefabId = prefabIndex.ToString(),
+                    prefabId = prefabName,
                     positionX = obj.transform.position.x,
                     positionY = obj.transform.position.y,
                     scaleX = obj.transform.localScale.x,
@@ -77,11 +88,43 @@ public class ApiWorldLoaderClient : MonoBehaviour
                     rotationZ = obj.transform.rotation.eulerAngles.z,
                     sortingLayer = obj.GetComponent<SpriteRenderer>().sortingLayerID
                 };
-                instantiatedPrefabsData.Add(data);
+                //instantiatedPrefabsData.Add(data);
+                PrefabData existingData = currentData.Find(data => data.prefabId == prefabName);
 
-                string jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
-                string url = "https://avansict2228256.azurewebsites.net/Object2D";
-                string response = await PerformApiCall(url, "POST", jsonData, SessionData.token);
+                if (existingData != null)
+                {
+                    // Update de bestaande data.
+                    newData.id = existingData.id; // Belangrijk: Behoud de bestaande ID.
+                    string updateJsonData = JsonConvert.SerializeObject(newData, Formatting.Indented);
+                    string updateUrl = $"https://avansict2228256.azurewebsites.net/Object2D/UpdateObject2D";
+                    string updateResponse = await PerformApiCall(updateUrl, "PUT", updateJsonData, SessionData.token);
+
+                    if (updateResponse != null)
+                    {
+                        Debug.Log("Object data updated in API: " + updateResponse);
+                    }
+                    else
+                    {
+                        Debug.LogError("Failed to update object data in API.");
+                    }
+                }
+                else
+                {
+                    // Voeg nieuwe data toe.
+                    string postJsonData = JsonConvert.SerializeObject(newData, Formatting.Indented);
+                    string postUrl = "https://avansict2228256.azurewebsites.net/Object2D";
+                    string postResponse = await PerformApiCall(postUrl, "POST", postJsonData, SessionData.token);
+
+                    if (postResponse != null)
+                    {
+                        Debug.Log("Object data saved to API: " + postResponse);
+                    }
+                    else
+                    {
+                        Debug.LogError("Failed to save Object data to API.");
+                    }
+                }
+
 
                 if (response != null)
                 {
@@ -102,6 +145,12 @@ public class ApiWorldLoaderClient : MonoBehaviour
         string url = $"https://avansict2228256.azurewebsites.net/Object2D/{SessionData.worldId}";
         string response = await PerformApiCall(url, "GET", null, SessionData.token);
 
+        GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
+        foreach (GameObject instantiatedPrefab in instantiatedObjects)
+        {
+            Destroy(instantiatedPrefab);
+        }
+
         if (response != null)
         {
             List<PrefabData> loadedData = JsonConvert.DeserializeObject<List<PrefabData>>(response);
@@ -109,20 +158,45 @@ public class ApiWorldLoaderClient : MonoBehaviour
             {
                 foreach (PrefabData data in loadedData)
                 {
-                    GameObject prefab = Resources.Load<GameObject>(data.prefabId);
-                    if (prefab != null)
+                    // Probeer de prefabnaam (string) om te zetten naar de enum PrefabNames
+                    if (Enum.TryParse(data.prefabId, out PrefabNames prefabName))
                     {
-                        GameObject instantiatedObject = Instantiate(prefab, new Vector3(data.positionX, data.positionY, 0), Quaternion.Euler(0, 0, data.rotationZ));
-                        instantiatedObject.transform.localScale = new Vector3(data.scaleX, data.scaleY, 1);
-                        instantiatedObject.GetComponent<SpriteRenderer>().sortingLayerID = data.sortingLayer;
-                        instantiatedObject.tag = "Instantiated";
+                        // Zoek de index van de prefab in de lijst 'prefabs'
+                        int prefabIndex = (int)prefabName;
+
+                        if (prefabIndex >= 0 && prefabIndex < prefabs.Count)
+                        {
+                            GameObject prefab = prefabs[prefabIndex]; // Haal de prefab op uit de lijst
+                            if (prefab != null)
+                            {
+                                GameObject instantiatedObject = Instantiate(prefab, new Vector3(data.positionX, data.positionY, 0), Quaternion.Euler(0, 0, data.rotationZ));
+                                instantiatedObject.transform.localScale = new Vector3(data.scaleX, data.scaleY, 1);
+                                instantiatedObject.GetComponent<SpriteRenderer>().sortingLayerID = data.sortingLayer;
+                                instantiatedObject.tag = "Instantiated";
+                                MenuPanel.items.Add(instantiatedObject);
+
+                                // Stel de MenuPanel referentie in
+                                DragDrop dragDrop = instantiatedObject.GetComponent<DragDrop>();
+                                if (dragDrop != null)
+                                {
+                                    dragDrop.menuPanel = GameObject.Find("LeftPanel").GetComponent<MenuPanel>(); // Zoek het MenuPanel component op LeftPanel
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError("Prefab not found at index: " + prefabIndex);
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError("Invalid prefab index: " + prefabIndex);
+                        }
                     }
                     else
                     {
-                        Debug.LogError("Prefab not found: " + data.prefabId);
+                        Debug.LogError("Invalid prefab name: " + data.prefabId);
                     }
                 }
-                Debug.Log("World loaded from API.");
             }
         }
         else
@@ -130,4 +204,19 @@ public class ApiWorldLoaderClient : MonoBehaviour
             Debug.LogError("Failed to load world data from API.");
         }
     }
+
+    public async void DeleteWorldObjects()
+    {
+        GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
+        foreach (GameObject instantiatedPrefab in instantiatedObjects)
+        {
+            Destroy(instantiatedPrefab);
+        }
+
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/environment/{SessionData.worldId}";
+        string response = await PerformApiCall(url, "Delete", null, SessionData.token);
+
+        Debug.Log(response);
+    }
+
 }

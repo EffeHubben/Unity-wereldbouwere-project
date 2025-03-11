@@ -1,7 +1,11 @@
 public enum PrefabNames
 {
-    Prefab1, // Vervang door de daadwerkelijke namen van je prefabs
-    Prefab2,
-    Prefab3,
-    // ...
+    Kist,
+    Doodskist,
+    Doos,
+    Bank,
+    Standbeeld,
+    Paal,
+    Ton,
+    Graf
 }
