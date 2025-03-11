@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using TMPro;
 using System.Text.RegularExpressions;
+using UnityEngine.SceneManagement;
 
 public class ApiClient : MonoBehaviour
 {
@@ -108,6 +109,8 @@ public class ApiClient : MonoBehaviour
         {
             SessionData.ownerUserId = userId; // Opslaan in SessionData
             SessionData.token = responseDto.accessToken; // Opslaan in SessionData
+            SceneManager.LoadScene("LoadGames");
+
         }
         else
         {
