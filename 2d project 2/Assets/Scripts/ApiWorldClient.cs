@@ -35,6 +35,7 @@ public class ApiWorldClient : MonoBehaviour
         }
         DontDestroyOnLoad(this);
     }
+
     private async Task<string> PerformApiCall(string url, string method, string jsonData = null, string token = null)
     {
         using (UnityWebRequest request = new UnityWebRequest(url, method))

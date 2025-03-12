@@ -24,7 +24,6 @@ public class ApiWorldLoaderClient : MonoBehaviour
         {
             instance = this;
         }
-        DontDestroyOnLoad(this);
     }
 
     private async Task<string> PerformApiCall(string url, string method, string jsonData = null, string token = null)
@@ -60,6 +59,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
 
     public async void SaveWorld()
     {
+        DeleteDatabaseObjects();
         instantiatedPrefabsData.Clear();
         GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
         List<PrefabData> currentData = new List<PrefabData>();
@@ -90,7 +90,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
                     sortingLayer = obj.GetComponent<SpriteRenderer>().sortingLayerID
                 };
                 //instantiatedPrefabsData.Add(data);
-                PrefabData existingData = currentData.Find(data => data.prefabId == prefabName);
+                PrefabData existingData = currentData.Find(data => data.id == newData.id);
 
                 if (existingData != null)
                 {
@@ -139,6 +139,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
         }
 
     }
+
 
 
     public async void LoadWorld()
@@ -213,6 +214,16 @@ public class ApiWorldLoaderClient : MonoBehaviour
         {
             Destroy(instantiatedPrefab);
         }
+
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/environment/{SessionData.worldId}";
+        string response = await PerformApiCall(url, "Delete", null, SessionData.token);
+
+        Debug.Log(response);
+    }
+
+    public async void DeleteDatabaseObjects()
+    {
+        GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
 
         string url = $"https://avansict2228256.azurewebsites.net/Object2D/environment/{SessionData.worldId}";
         string response = await PerformApiCall(url, "Delete", null, SessionData.token);
