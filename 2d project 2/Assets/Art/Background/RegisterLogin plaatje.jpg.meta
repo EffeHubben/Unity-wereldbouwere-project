@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      RegisterLogin plaatje_0: -6893901292654763164
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

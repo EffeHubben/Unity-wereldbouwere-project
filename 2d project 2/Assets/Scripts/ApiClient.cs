@@ -74,7 +74,7 @@ public class ApiClient : MonoBehaviour
 
             string jsonData = JsonUtility.ToJson(registerDto);
 
-            var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/account/register", "POST", jsonData);
+            var response = await PerformApiCall("https://localhost:7015/account/register", "POST", jsonData);
             Debug.Log(response);
             Debug.Log(emailInput.text);
             Debug.Log(passwordInput.text);
@@ -92,7 +92,7 @@ public class ApiClient : MonoBehaviour
 
         string jsonData = JsonUtility.ToJson(loginDto);
 
-        var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/account/login", "POST", jsonData);
+        var response = await PerformApiCall("https://localhost:7015/account/login", "POST", jsonData);
         loginWarning.text = "Email of wachtwoord is onjuist.";
         bool responseSuccess = response.ToString().Contains("token");
         if (responseSuccess)
@@ -124,7 +124,7 @@ public class ApiClient : MonoBehaviour
 
     public async Task<string> GetUserId(string token)
     {
-        var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/wereldbouwer/GetUserId", "GET", null, token);
+        var response = await PerformApiCall("https://localhost:7015/wereldbouwer/GetUserId", "GET", null, token);
 
         if (!string.IsNullOrEmpty(response))
         {
