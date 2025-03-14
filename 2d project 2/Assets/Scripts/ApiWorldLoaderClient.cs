@@ -65,7 +65,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
         List<PrefabData> currentData = new List<PrefabData>();
 
         // Haal de huidige data op van de API.
-        string url = $"https://avansict2228256.azurewebsites.net/Object2D/{SessionData.worldId}";
+        string url = $"https://localhost:7015/Object2D/{SessionData.worldId}";
         string response = await PerformApiCall(url, "GET", null, SessionData.token);
 
         if (response != null)
