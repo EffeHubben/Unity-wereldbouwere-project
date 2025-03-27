@@ -216,7 +216,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
         }
 
         string url = $"https://localhost:7015/Object2D/environment/{SessionData.worldId}";
-        string response = await PerformApiCall(url, "Delete", null, SessionData.token);
+        string response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
         Debug.Log(response);
     }
@@ -226,7 +226,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
         GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
 
         string url = $"https://localhost:7015/Object2D/environment/{SessionData.worldId}";
-        string response = await PerformApiCall(url, "Delete", null, SessionData.token);
+        string response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
         Debug.Log(response);
     }

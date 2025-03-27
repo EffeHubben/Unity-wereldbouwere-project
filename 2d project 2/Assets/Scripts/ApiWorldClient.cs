@@ -79,6 +79,13 @@ public class ApiWorldClient : MonoBehaviour
 
         if (SessionData.token != null)
         {
+
+            if (await WorldNameExists(controller.inputName.text, SessionData.ownerUserId))
+            {
+                Debug.LogError($"Wereldnaam '{controller.inputName.text}' bestaat al voor deze gebruiker.");
+                return; // Stop de registratie als de naam al bestaat
+            }
+
             var registerDto = new PostWorldRegisterRequestDto()
             {
                 name = controller.inputName.text,
@@ -98,7 +105,40 @@ public class ApiWorldClient : MonoBehaviour
         LoadWorld();
     }
 
-    public async void LoadWorld()
+    private async Task<bool> WorldNameExists(string worldName, string ownerUserId)
+    {
+        string url = $"https://localhost:7015/wereldbouwer/getwereld/{ownerUserId}";
+        var response = await PerformApiCall(url, "GET", null, SessionData.token);
+
+        if (response == null)
+        {
+            Debug.LogError("API response is null bij het controleren van de wereldnaam.");
+            return false; // Ga ervan uit dat de naam niet bestaat bij een fout
+        }
+
+        try
+        {
+            List<PostWorldLoadResponseDto> worlds = JsonConvert.DeserializeObject<List<PostWorldLoadResponseDto>>(response);
+            if (worlds != null)
+            {
+                foreach (var world in worlds)
+                {
+                    if (world.name == worldName)
+                    {
+                        return true; // De naam bestaat al
+                    }
+                }
+            }
+            return false; // De naam bestaat niet
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Error deserializing JSON response bij het controleren van de wereldnaam: " + ex.Message);
+            return false; // Ga ervan uit dat de naam niet bestaat bij een fout
+        }
+    }
+
+    public async Task LoadWorld()
     {
         if (SessionData.token != null)
         {
@@ -176,7 +216,7 @@ public class ApiWorldClient : MonoBehaviour
     {
         if (SessionData.token != null)
         {
-            DeleteWorldObjectsFromLoad();
+            await DeleteWorldObjectsFromLoad(worldId);
             string url = $"https://localhost:7015/wereldbouwer/{worldId}";
             var response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
@@ -184,7 +224,7 @@ public class ApiWorldClient : MonoBehaviour
             {
                 Debug.Log($"Wereld met ID {worldId} verwijderd: {response}");
                 // Hier kun je eventueel de UI updaten of andere acties uitvoeren na het verwijderen
-                LoadWorld(); // Herlaad de wereldlijst na het verwijderen
+                await LoadWorld(); // Herlaad de wereldlijst na het verwijderen
             }
             else
             {
@@ -197,10 +237,10 @@ public class ApiWorldClient : MonoBehaviour
         }
     }
 
-    public async void DeleteWorldObjectsFromLoad()
+    public async Task DeleteWorldObjectsFromLoad(string worldId)
     {
-        string url = $"https://localhost:7015/Object2D/environment/{SessionData.worldId}";
-        string response = await PerformApiCall(url, "Delete", null, SessionData.token);
+        string url = $"https://localhost:7015/Object2D/environment/{worldId}";
+        string response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
         Debug.Log(response);
     }
