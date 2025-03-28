@@ -63,30 +63,38 @@ public class ApiClient : MonoBehaviour
 
     public async void Register()
     {
-        bool wachtwoordValidatie = await WachtwoordValidatieAsync(passwordInput.text);
+        string sanitizedEmail = SanitizeInput(emailInput.text);
+        string sanitizedPassword = SanitizeInput(passwordInput.text);
+
+        bool wachtwoordValidatie = await WachtwoordValidatieAsync(sanitizedPassword);
         if (wachtwoordValidatie)
         {
+
             var registerDto = new PostRegisterRequestDto()
             {
-                email = emailInput.text.ToString(),
-                password = passwordInput.text.ToString()
+                email = sanitizedEmail,
+                password = sanitizedPassword
             };
+
 
             string jsonData = JsonUtility.ToJson(registerDto);
 
             var response = await PerformApiCall("https://localhost:7015/account/register", "POST", jsonData);
             Debug.Log(response);
-            Debug.Log(emailInput.text);
-            Debug.Log(passwordInput.text);
+            Debug.Log(sanitizedEmail);
+            Debug.Log(sanitizedPassword);
         }
     }
 
     public async void Login()
     {
+        string sanitizedEmail = SanitizeInput(emailInput.text);
+        string sanitizedPassword = SanitizeInput(passwordInput.text);
+
         var loginDto = new PostLoginRequestDto()
         {
-            email = emailInput.text.ToString(),
-            password = passwordInput.text.ToString()
+            email = sanitizedEmail,
+            password = sanitizedPassword
         };
 
 
@@ -118,8 +126,8 @@ public class ApiClient : MonoBehaviour
         }
         Debug.Log(SessionData.ownerUserId);
         Debug.Log(response);
-        Debug.Log(emailInput.text);
-        Debug.Log(passwordInput.text);
+        Debug.Log(sanitizedEmail);
+        Debug.Log(sanitizedPassword);
     }
 
     public async Task<string> GetUserId(string token)
@@ -173,5 +181,11 @@ public class ApiClient : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    private string SanitizeInput(string input)
+    {
+        // Remove or escape special characters
+        return Regex.Replace(input, @"[;'\-\\""]", ""); // Remove ; ' - " \
     }
 }

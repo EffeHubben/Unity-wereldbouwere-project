@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.SceneManagement;
+using System.Text.RegularExpressions;
 
 public class ApiWorldClient : MonoBehaviour
 {
@@ -80,15 +81,17 @@ public class ApiWorldClient : MonoBehaviour
         if (SessionData.token != null)
         {
 
-            if (await WorldNameExists(controller.inputName.text, SessionData.ownerUserId))
+            string sanitizedWorldName = SanitizeInput(controller.inputName.text);
+
+            if (await WorldNameExists(sanitizedWorldName, SessionData.ownerUserId))
             {
-                Debug.LogError($"Wereldnaam '{controller.inputName.text}' bestaat al voor deze gebruiker.");
-                return; // Stop de registratie als de naam al bestaat
+                Debug.LogError($"Wereldnaam '{sanitizedWorldName}' bestaat al voor deze gebruiker.");
+                return;
             }
 
             var registerDto = new PostWorldRegisterRequestDto()
             {
-                name = controller.inputName.text,
+                name = sanitizedWorldName,
                 ownerUserId = SessionData.ownerUserId,
                 maxLength = 200,
                 maxHeight = 200
@@ -243,5 +246,11 @@ public class ApiWorldClient : MonoBehaviour
         string response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
         Debug.Log(response);
+    }
+
+    private string SanitizeInput(string input)
+    {
+        // Remove or escape special characters
+        return Regex.Replace(input, @"[;'\-\\""]", ""); // Remove ; ' - " \
     }
 }
