@@ -69,10 +69,11 @@ public class ApiWorldClient : MonoBehaviour
     }
     public async void RegisterWorld(WorldPrefabController controller)
     {
-        Debug.Log($"InputName: {nameInput}");
+        string sanitizedWorldName = SanitizeInput(controller.inputName.text);
+        Debug.Log($"InputName: {sanitizedWorldName}");
 
         // Controleer de lengte van de wereldnaam
-        if (controller.inputName.text.Length < minWorldNameLength || controller.inputName.text.Length > maxWorldNameLength)
+        if (sanitizedWorldName.Length < minWorldNameLength || sanitizedWorldName.Length > maxWorldNameLength)
         {
             Debug.LogError($"Wereldnaam moet tussen {minWorldNameLength} en {maxWorldNameLength} karakters lang zijn.");
             return; // Stop de registratie als de lengte niet klopt
@@ -80,8 +81,6 @@ public class ApiWorldClient : MonoBehaviour
 
         if (SessionData.token != null)
         {
-
-            string sanitizedWorldName = SanitizeInput(controller.inputName.text);
 
             if (await WorldNameExists(sanitizedWorldName, SessionData.ownerUserId))
             {
