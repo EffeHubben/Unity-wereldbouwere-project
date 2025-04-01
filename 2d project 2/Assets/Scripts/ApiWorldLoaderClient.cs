@@ -65,7 +65,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
         List<PrefabData> currentData = new List<PrefabData>();
 
         // Haal de huidige data op van de API.
-        string url = $"https://localhost:7015/Object2D/{SessionData.worldId}";
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/{SessionData.worldId}";
         string response = await PerformApiCall(url, "GET", null, SessionData.token);
 
         if (response != null)
@@ -97,7 +97,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
                     // Update de bestaande data.
                     newData.id = existingData.id; // Belangrijk: Behoud de bestaande ID.
                     string updateJsonData = JsonConvert.SerializeObject(newData, Formatting.Indented);
-                    string updateUrl = $"https://localhost:7015/Object2D/UpdateObject2D";
+                    string updateUrl = $"https://avansict2228256.azurewebsites.net/Object2D/UpdateObject2D";
                     string updateResponse = await PerformApiCall(updateUrl, "PUT", updateJsonData, SessionData.token);
 
                     if (updateResponse != null)
@@ -113,7 +113,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
                 {
                     // Voeg nieuwe data toe.
                     string postJsonData = JsonConvert.SerializeObject(newData, Formatting.Indented);
-                    string postUrl = "https://localhost:7015/Object2D";
+                    string postUrl = "https://avansict2228256.azurewebsites.net/Object2D";
                     string postResponse = await PerformApiCall(postUrl, "POST", postJsonData, SessionData.token);
 
                     if (postResponse != null)
@@ -144,7 +144,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
 
     public async void LoadWorld()
     {
-        string url = $"https://localhost:7015/Object2D/{SessionData.worldId}";
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/{SessionData.worldId}";
         string response = await PerformApiCall(url, "GET", null, SessionData.token);
 
         GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
@@ -215,7 +215,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
             Destroy(instantiatedPrefab);
         }
 
-        string url = $"https://localhost:7015/Object2D/environment/{SessionData.worldId}";
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/environment/{SessionData.worldId}";
         string response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
         Debug.Log(response);
@@ -225,7 +225,7 @@ public class ApiWorldLoaderClient : MonoBehaviour
     {
         GameObject[] instantiatedObjects = GameObject.FindGameObjectsWithTag("Instantiated");
 
-        string url = $"https://localhost:7015/Object2D/environment/{SessionData.worldId}";
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/environment/{SessionData.worldId}";
         string response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
         Debug.Log(response);

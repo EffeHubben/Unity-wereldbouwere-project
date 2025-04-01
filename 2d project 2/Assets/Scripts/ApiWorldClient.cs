@@ -96,7 +96,7 @@ public class ApiWorldClient : MonoBehaviour
                 maxHeight = 200
             };
             string jsonData = JsonUtility.ToJson(registerDto);
-            var response = await PerformApiCall("https://localhost:7015/wereldbouwer", "POST", jsonData, SessionData.token);
+            var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/wereldbouwer", "POST", jsonData, SessionData.token);
             Debug.Log(response);
         } else
         {
@@ -109,7 +109,7 @@ public class ApiWorldClient : MonoBehaviour
 
     private async Task<bool> WorldNameExists(string worldName, string ownerUserId)
     {
-        string url = $"https://localhost:7015/wereldbouwer/getwereld/{ownerUserId}";
+        string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/getwereld/{ownerUserId}";
         var response = await PerformApiCall(url, "GET", null, SessionData.token);
 
         if (response == null)
@@ -148,7 +148,7 @@ public class ApiWorldClient : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
-            string url = $"https://localhost:7015/wereldbouwer/getwereld/{SessionData.ownerUserId}";
+            string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/getwereld/{SessionData.ownerUserId}";
             var response = await PerformApiCall(url, "GET", null, SessionData.token);
 
             if (response == null)
@@ -219,7 +219,7 @@ public class ApiWorldClient : MonoBehaviour
         if (SessionData.token != null)
         {
             await DeleteWorldObjectsFromLoad(worldId);
-            string url = $"https://localhost:7015/wereldbouwer/{worldId}";
+            string url = $"https://avansict2228256.azurewebsites.net/wereldbouwer/{worldId}";
             var response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
             if (response != null)
@@ -241,7 +241,7 @@ public class ApiWorldClient : MonoBehaviour
 
     public async Task DeleteWorldObjectsFromLoad(string worldId)
     {
-        string url = $"https://localhost:7015/Object2D/environment/{worldId}";
+        string url = $"https://avansict2228256.azurewebsites.net/Object2D/environment/{worldId}";
         string response = await PerformApiCall(url, "DELETE", null, SessionData.token);
 
         Debug.Log(response);
