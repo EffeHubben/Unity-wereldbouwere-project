@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      prefab achtergrond_0: 3686664525668835114
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

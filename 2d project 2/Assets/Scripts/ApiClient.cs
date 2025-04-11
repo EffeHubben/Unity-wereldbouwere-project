@@ -13,6 +13,7 @@ public class ApiClient : MonoBehaviour
     public TMP_InputField passwordInput;
     public TMP_Text errorText;
     public TMP_Text loginWarning;
+    private string apiError;
 
     public static ApiClient instance { get; private set; }
     public PostLoginResponseDto responseDto { get; private set; }
@@ -56,6 +57,7 @@ public class ApiClient : MonoBehaviour
             else
             {
                 Debug.LogError("Fout bij API-aanroep: " + request.error);
+                apiError = request.error;
                 return null;
             }
         }
@@ -80,6 +82,23 @@ public class ApiClient : MonoBehaviour
             string jsonData = JsonUtility.ToJson(registerDto);
 
             var response = await PerformApiCall("https://avansict2228256.azurewebsites.net/account/register", "POST", jsonData);
+            if (response == null)
+            {
+                Debug.LogError("API call failed, no response received."); 
+                
+                if (apiError.Contains("400 Bad Request")) // Simple check for "400" in the response.  Adjust as needed for your API's exact error format.
+                {
+                    Debug.LogWarning($"Registration failed for email: {sanitizedEmail}. Server returned: {response}");
+                    loginWarning.text = "Deze email is al in gebruik."; // Inform the user
+                }
+                return; // Stop further processing if there's no response
+            }
+            
+            else
+            {
+                Debug.Log($"Registration succesvol voor email: {sanitizedEmail}.");
+                loginWarning.text = "Registratie succesvol!";
+            }
             Debug.Log(response);
             Debug.Log(sanitizedEmail);
             Debug.Log(sanitizedPassword);

@@ -20,6 +20,8 @@ public class ApiWorldClient : MonoBehaviour
     public Button createButton; // Reference to the create button\
     public int minWorldNameLength = 1;
     public int maxWorldNameLength = 25;
+    public TMP_Text waarschuwingText;
+    public GameObject waarschuwingBord;
     public static ApiWorldClient instance { get; private set; }
     void Awake()
     {
@@ -85,8 +87,13 @@ public class ApiWorldClient : MonoBehaviour
             if (await WorldNameExists(sanitizedWorldName, SessionData.ownerUserId))
             {
                 Debug.LogError($"Wereldnaam '{sanitizedWorldName}' bestaat al voor deze gebruiker.");
+                waarschuwingText.text = $"Wereld naam '{sanitizedWorldName}' bestaat al voor deze account, gebruik een andere naam";
+                waarschuwingBord.SetActive(true);
                 return;
             }
+
+            waarschuwingBord.SetActive(false);
+            waarschuwingText.text = "";
 
             var registerDto = new PostWorldRegisterRequestDto()
             {

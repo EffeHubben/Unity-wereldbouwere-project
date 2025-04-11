@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      loadgames achtergrond_0: -3950676152574896614
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
