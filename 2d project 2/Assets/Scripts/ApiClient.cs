@@ -29,7 +29,6 @@ public class ApiClient : MonoBehaviour
         {
             instance = this;
         }
-        DontDestroyOnLoad(this);
     }
     private async Task<string> PerformApiCall(string url, string method, string jsonData = null, string token = null)
     {
