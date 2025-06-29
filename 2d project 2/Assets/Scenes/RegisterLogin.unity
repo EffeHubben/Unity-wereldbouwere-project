@@ -490,8 +490,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'De volgende invoerwaarden zijn niet toegestaan en worden verwijderd: ;
-    '' - " \'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -606,8 +605,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -632, y: -30}
-  m_SizeDelta: {x: 450, y: 320}
+  m_AnchoredPosition: {x: -636.19, y: -67}
+  m_SizeDelta: {x: 517.2498, y: 395.1616}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &457554508
 MonoBehaviour:
@@ -673,7 +672,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3950676152574896614, guid: d6dd0939d06874b4fa82710a2abdbbd0, type: 3}
+  m_Sprite: {fileID: -8321170433466421060, guid: f764d4cd437cca343a1347dee70c2f51, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2697,8 +2696,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -5, y: -444}
-  m_SizeDelta: {x: 160, y: 51.667}
+  m_AnchoredPosition: {x: 611.21, y: -75.889}
+  m_SizeDelta: {x: 146.8138, y: 41.7773}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1643897329
 MonoBehaviour:
@@ -2856,8 +2855,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -263.3947}
-  m_SizeDelta: {x: 160, y: 59.0702}
+  m_AnchoredPosition: {x: 610.39, y: 71.294}
+  m_SizeDelta: {x: 145.1655, y: 42.5874}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1688339722
 MonoBehaviour:
